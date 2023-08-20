@@ -1,7 +1,7 @@
 from openpyxl import Workbook
 
 
-def merge_cells_with_same_value(worksheet, excel_row_index):
+def merge_cells_for_header(worksheet, excel_row_index):
     row_values = [cell.value for cell in worksheet[excel_row_index]]
     row_len = len(row_values)
     combine_start = 0    
@@ -17,6 +17,21 @@ def merge_cells_with_same_value(worksheet, excel_row_index):
             worksheet.merge_cells(start_row=excel_row_index, start_column=combine_start+1,
                                     end_row=excel_row_index, end_column=combine_end)
         combine_start = combine_end
+        
+        
+def merge_cells_for_records(worksheet, excel_row_start, excel_row_end, sort_key_row_index):
+    records = []
+    for row in range(excel_row_start, excel_row_end + 1):
+        records.append([cell.value for cell in worksheet[row]])
+        
+    current_combined_segments = [(excel_row_start, excel_row_end)]
+    for idx, key_index in enumerate(sort_key_row_index):
+        next_combined_segments = []
+        pass
+        
+    for r in records:
+        print('...',r)
+    pass
 
 def extend_record_by_keys(record_dict, keys_list):
     result = [record_dict.get(key, None) for key in keys_list]
@@ -97,6 +112,8 @@ class Record:
 
         # 根据sort_indexes对self.records进行排序
         self.records.sort(key=lambda record: [record[index] for index in sort_indexes])
+        
+        return sort_indexes
 
         
     
@@ -128,13 +145,17 @@ class Table:
         # 将表头写入工作表
         for header in self.header.headers:
             worksheet.append(header)        
-            merge_cells_with_same_value(worksheet, worksheet.max_row)
+            merge_cells_for_header(worksheet, worksheet.max_row)
 
         # 将记录写入工作表
         self.record.expand_by_keys(self.header.record_keys)
-        self.record.sort_by_keys(self.header.record_keys, self.header.sort_keys)
+        sort_key_row_index = self.record.sort_by_keys(self.header.record_keys, self.header.sort_keys)
+        record_row_start = worksheet.max_row + 1
         for record in self.record.records:            
             worksheet.append(record)
+        record_row_end = worksheet.max_row
+        merge_cells_for_records(worksheet, record_row_start, record_row_end, sort_key_row_index)
+
 
         # 输出表格数据到控制台
         for row in worksheet.iter_rows(values_only=True):

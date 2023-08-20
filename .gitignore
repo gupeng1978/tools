@@ -164,3 +164,6 @@ cython_debug/
 
 # 调试信息
 *.pdb
+
+*.xlsx
+*.xls
