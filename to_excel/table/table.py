@@ -1,4 +1,5 @@
 from openpyxl import Workbook
+import re
 from table_merge import Table_Merge
 from table_attr import Table_Attr
 
@@ -50,10 +51,22 @@ class Header:
 class Record:
     def __init__(self):
         self.records = []
+        
+    # 解析字符串获取类似(key@value)的字典
+    @staticmethod
+    def __parse_line(line):
+        pattern = r'\(([^@]+)@([^)]+)\)'
+        matches = re.findall(pattern, line)
+        return {key: value for key, value in matches} 
 
     def add_from_str(self, record_str):
         if isinstance(record_str, str):
-            self.records.append(record_str)
+            lines = record_str.split('\n')
+            for line in lines:
+                one = Record.__parse_line(line)
+                if one:
+                    self.records.append(one)
+
         else:
             raise ValueError("参数必须是字符串")
 
@@ -103,6 +116,11 @@ class Table:
                 # 检查record的所有键是否都在record_keys中
                 if not all(key in record_keys for key in record.keys()):
                     raise ValueError("所有的record的keys都必须在record_keys中")
+                
+                # 检查record的必须有所有的sort_keys
+                if any(not key in record.keys() for key in sort_keys):
+                    raise ValueError("record的少关键key, record = {}, 关键keys = {}".format(record, sort_keys))
+                
                 self.__record.records[index] = [record.get(key, None) for key in record_keys]
             else:
                 raise TypeError("记录必须是字典类型")
