@@ -1,5 +1,4 @@
 from openpyxl import Workbook
-import unittest
 
 
 class Table_Merge:
@@ -9,6 +8,7 @@ class Table_Merge:
         self.__sort_key_row_index = sort_key_row_index
         pass
     
+    #  header merge by row
     def __merge_cells_by_row(self, row_start, row_end):
         worksheet = self.__worksheet
         for row_cells in worksheet.iter_rows(min_row=row_start, max_row=row_end):
@@ -17,13 +17,14 @@ class Table_Merge:
             for col, cell in enumerate(row_cells, start=1):
                 if cell.value == value_to_merge:
                     continue
-                if start_col:
+                if start_col and col - 1 > start_col:
                     worksheet.merge_cells(start_row=cell.row, start_column=start_col, end_row=cell.row, end_column=col - 1)
                 start_col = col
                 value_to_merge = cell.value
-            if start_col:
+            if start_col and col > start_col:
                 worksheet.merge_cells(start_row=cell.row, start_column=start_col, end_row=cell.row, end_column=col)
-                
+    
+    # header merge by col            
     def __merge_cells_by_col(self, row_start, row_end):
         worksheet = self.__worksheet
         for col_cells in worksheet.iter_cols(min_row=row_start, max_row=row_end):
@@ -32,11 +33,11 @@ class Table_Merge:
             for row, cell in enumerate(col_cells, start=row_start):
                 if cell.value == value_to_merge:
                     continue
-                if start_row:
+                if start_row and row - 1 > start_row:
                     worksheet.merge_cells(start_row=start_row, start_column=cell.column, end_row=row - 1, end_column=cell.column)
                 start_row = row
                 value_to_merge = cell.value
-            if start_row:
+            if start_row and row > start_row:
                 worksheet.merge_cells(start_row=start_row, start_column=cell.column, end_row=row, end_column=cell.column)
     
     

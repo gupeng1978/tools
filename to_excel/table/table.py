@@ -1,5 +1,6 @@
 from openpyxl import Workbook
 from table_merge import Table_Merge
+from table_attr import Table_Attr
 
 
 class Header:
@@ -119,6 +120,11 @@ class Table:
     def merge_cells(self):
         table_merge = Table_Merge(self.__worksheet, self.__table_info, self.__sort_key_row_index)
         table_merge.merge()        
+        
+    def set_attrs(self):
+        table_attr = Table_Attr(self.__worksheet, self.__table_info, self.__sort_key_row_index)
+        table_attr.set_attr()
+        pass
         
     def __str__(self):
         # 获取表格信息中的起始和结束行
