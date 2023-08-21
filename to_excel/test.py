@@ -84,3 +84,32 @@ for row in worksheet.iter_rows(values_only=True):
     print(row)
 workbook.save("output3.xlsx")
 
+
+from openpyxl import Workbook
+
+def merge_cells_by_row(worksheet, excel_row_start, excel_row_end):
+    for row_cells in worksheet.iter_rows(min_row=excel_row_start, max_row=excel_row_end):
+        start_col = None
+        value_to_merge = None
+        for col, cell in enumerate(row_cells, start=1):
+            if cell.value == value_to_merge:
+                continue
+            if start_col:
+                worksheet.merge_cells(start_row=cell.row, start_column=start_col, end_row=cell.row, end_column=col - 1)
+            start_col = col
+            value_to_merge = cell.value
+        if start_col:
+            worksheet.merge_cells(start_row=cell.row, start_column=start_col, end_row=cell.row, end_column=col)
+
+# 示例用法
+wb = Workbook()
+ws = wb.active
+ws.append(["A", "A", "B", "B"])
+ws.append(["C", "C", "D", "D"])
+merge_cells_by_row(ws, 1, 2)
+wb.save("merged.xlsx")
+
+
+
+
+

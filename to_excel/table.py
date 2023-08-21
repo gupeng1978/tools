@@ -1,98 +1,6 @@
 from openpyxl import Workbook
+from table_merge import Table_Merge
 
-
-def merge_cells_for_header(worksheet, excel_row_index):
-    row_values = [cell.value for cell in worksheet[excel_row_index]]
-    row_len = len(row_values)
-    combine_start = 0    
-    while combine_start < row_len:
-        combine_end = combine_start + 1
-        while combine_end < row_len:
-            if row_values[combine_end] != row_values[combine_start]:
-                break
-            combine_end += 1
-        
-        # combine if possible
-        if combine_end != combine_start + 1:
-            worksheet.merge_cells(start_row=excel_row_index, start_column=combine_start+1,
-                                    end_row=excel_row_index, end_column=combine_end)
-        combine_start = combine_end
-        
-
-
-def merge_cells_for_records(worksheet, excel_row_start, excel_row_end, sort_key_row_index):
-    
-    # 遍历每一列
-    allowed_seg_table = [{'start':excel_row_start, 'end':excel_row_end}]
-    next_allowed_seg_table = []
-    
-    def get_segments_from_list(req_seg):
-        allowed_segments = []
-        
-        # 遍历允许的分段表
-        for allowed_seg in allowed_seg_table:
-            # 检查请求分段与允许分段的交集
-            start = max(req_seg['start'], allowed_seg['start'])
-            end = min(req_seg['end'], allowed_seg['end'])
-            
-            # 如果存在交集，则添加到允许的分段列表中
-            if start < end:
-                allowed_segments.append({'start': start, 'end': end})
-        
-        return allowed_segments
-    
-    def try_merged(start_row, end_row, column) :
-        allowed_seg = get_segments_from_list({'start':start_row, 'end':end_row})
-        if allowed_seg :
-            for seg in allowed_seg:
-                worksheet.merge_cells(
-                    start_row=seg['start'], start_column=column,
-                    end_row=seg['end'], end_column=column
-                )
-            next_allowed_seg_table.append(seg)        
-        pass
-    
-    for col in worksheet.iter_cols(min_row=excel_row_start, max_row=excel_row_end):
-        
-        # 只合并sort_key_row_index所在的列
-        if col[0].column - 1 not in sort_key_row_index:
-            continue
-        next_allowed_seg_table = []
-        
-        col_number = col[0].column
-        combine_start = excel_row_start
-        previous_value = None
-        # 遍历列中的每一行
-        for row_index, cell in enumerate(col, start=excel_row_start):
-            if previous_value is None:
-                previous_value = cell.value
-                continue
-            
-            # 如果当前值与前一个值相同，继续遍历
-            if cell.value == previous_value:
-                continue
-            
-            # 如果当前值与前一个值不同，检查是否需要合并
-            if row_index - combine_start > 1:
-                try_merged(combine_start, row_index - 1, cell.column)
-            
-            # 更新合并的起始行和前一个值
-            combine_start = row_index
-            previous_value = cell.value
-        
-        # 检查最后一组单元格是否需要合并
-        if excel_row_end - combine_start > 0:
-            try_merged(combine_start, excel_row_end, cell.column)
-        
-        # 更新下一次迭代允许的分段    
-        allowed_seg_table = next_allowed_seg_table
-                
-
-
-def extend_record_by_keys(record_dict, keys_list):
-    result = [record_dict.get(key, None) for key in keys_list]
-    return result
-            
 
 class Header:
     def __init__(self):
@@ -129,6 +37,12 @@ class Header:
         else:
             raise ValueError("字典的键和值必须是字符串")
         
+    def __str__(self):
+        header_str = "Headers:\n" + "\n".join(", ".join(header) for header in self.headers)
+        alias_str = "Aliases:\n" + "\n".join(f"{k}: {v}" for k, v in self.aliases.items())
+        active_header_str = "Active Header:\n" + ", ".join(self.record_keys) if self.record_keys else "None"
+        return f"{header_str}\n\n{alias_str}\n\n{active_header_str}"
+        
     
 
 
@@ -148,74 +62,97 @@ class Record:
         else:
             raise ValueError("参数必须是字典")
         
-    def expand_by_keys(self, record_keys):
-        for index, record in enumerate(self.records):
-            if isinstance(record, dict):
-                # 检查record的所有键是否都在record_keys中
-                if not all(key in record_keys for key in record.keys()):
-                    raise ValueError("所有的record的keys都必须在record_keys中")
-                self.records[index] = [record.get(key, None) for key in record_keys]
-            else:
-                raise TypeError("记录必须是字典类型")
-            
-    def sort_by_keys(self, record_keys, sort_keys):
-        # 检查sort_keys是否是record_keys的子集
-        if not all(key in record_keys for key in sort_keys):
-            raise ValueError("sort_keys必须是record_keys的子集")
-
-        # 计算sort_keys在record_keys的索引列表
-        sort_indexes = [record_keys.index(key) for key in sort_keys]
-
-        # 根据sort_indexes对self.records进行排序
-        self.records.sort(key=lambda record: [record[index] for index in sort_indexes])
-        
-        return sort_indexes
-
-        
-    
-            
-        
+    def __str__(self):
+        records_str = "\n".join(str(record) for record in self.records)
+        return f"Records:\n{records_str}"
 
 
 class Table:
-    def __init__(self, header, record):
+    def __init__(self, worksheet, header, record):
         if not isinstance(header, Header) or not isinstance(record, Record):
             raise TypeError("header and record must be Header and Record objects respectively.")
-        self.header = header
-        self.record = record
+        self.__worksheet = worksheet
+        self.__header = header
+        self.__record = record       
+        self.__table_info = {'header' : {'row_start':None, 'row_end':None}, 'record' : {'row_start':None, 'row_end':None}}        
+        self.__sort_key_row_index = None
+        
         
         # replace the header name with alias name
-        for h in self.header.headers:
+        for h in self.__header.headers:
             for i, l in enumerate(h):
                 if l in header.aliases:
                     h[i] = header.aliases[l]
                     
         # check self.header.record_keys list strings cannot be the same
-        if len(set(self.header.record_keys)) != len(self.header.record_keys):
+        if len(set(self.__header.record_keys)) != len(self.__header.record_keys):
             raise ValueError("用户设置header的record_keys 包含重复字符串")
+        
+        self.__to_excel()
 
-                    
+            
+    def __expand_and_sort_by_keys(self, record_keys, sort_keys):
+        # 检查sort_keys是否是record_keys的子集
+        if not all(key in record_keys for key in sort_keys):
+            raise ValueError("sort_keys必须是record_keys的子集")
+        
+        # expand
+        for index, record in enumerate(self.__record.records):
+            if isinstance(record, dict):
+                # 检查record的所有键是否都在record_keys中
+                if not all(key in record_keys for key in record.keys()):
+                    raise ValueError("所有的record的keys都必须在record_keys中")
+                self.__record.records[index] = [record.get(key, None) for key in record_keys]
+            else:
+                raise TypeError("记录必须是字典类型")
 
-    def to_excel(self, worksheet):
+        # sort 
+        # 计算sort_keys在record_keys的索引列表
+        sort_indexes = [record_keys.index(key) for key in sort_keys]
+
+        # 根据sort_indexes对self.records进行排序
+        self.__record.records.sort(key=lambda record: [record[index] for index in sort_indexes])
+        
+        self.__sort_key_row_index = sort_indexes
+    
+    
+    def merge_cells(self):
+        table_merge = Table_Merge(self.__worksheet, self.__table_info, self.__sort_key_row_index)
+        table_merge.merge()        
+        
+    def __str__(self):
+        # 获取表格信息中的起始和结束行
+        row_start = self.__table_info['header']['row_start']
+        row_end = self.__table_info['record']['row_end']
+
+        # 使用列表推导式构建一个包含指定行范围的字符串列表
+        rows = ['\t'.join(map(str, row)) for row in self.__worksheet.iter_rows(min_row=row_start, max_row=row_end, values_only=True)]
+
+        # 使用换行符连接所有行，构建一个完整的字符串
+        return '\n'.join(rows)    
+    
+
+    def __to_excel(self):        
+        # 计算表格信息
+        worksheet = self.__worksheet
+        self.__table_info['header']['row_start'] = worksheet.max_row
+        self.__table_info['header']['row_end'] = self.__table_info['header']['row_start'] + len(self.__header.headers) - 1
+        self.__table_info['record']['row_start'] = self.__table_info['header']['row_end'] + 1
+        self.__table_info['record']['row_end'] = self.__table_info['record']['row_start'] + len(self.__record.records) - 1
        
-        # 将表头写入工作表
-        for header in self.header.headers:
+        # 将表头写入工作表        
+        for header in self.__header.headers:
             worksheet.append(header)        
-            merge_cells_for_header(worksheet, worksheet.max_row)
 
         # 将记录写入工作表
-        self.record.expand_by_keys(self.header.record_keys)
-        sort_key_row_index = self.record.sort_by_keys(self.header.record_keys, self.header.sort_keys)
+        self.__expand_and_sort_by_keys(self.__header.record_keys, self.__header.sort_keys)
         record_row_start = worksheet.max_row + 1
-        for record in self.record.records:            
+        for record in self.__record.records:            
             worksheet.append(record)
         record_row_end = worksheet.max_row
-        merge_cells_for_records(worksheet, record_row_start, record_row_end, sort_key_row_index)
 
 
-        # 输出表格数据到控制台
-        for row in worksheet.iter_rows(values_only=True):
-            print(row)
+        
 
             
 
@@ -233,6 +170,8 @@ header.set_alias({"model": "模型",
                   "host_fps": "帧率",
                   "device_nn":"device推理",
                   "host_pcie_nn":"Host PCIe推理"})
+
+print(header)
 
 record = Record()
 # record.add_from_str("John, 25")
@@ -274,13 +213,17 @@ record.add_from_dict({"model": "resnet50",
                       "step" :  "copyD2H",
                       "host_ms" : "3.5"})
 
-table = Table(header, record)
+print(record)
 
  # 创建一个工作簿和工作表
 workbook = Workbook()
 worksheet = workbook.active
+
+table = Table(worksheet, header, record)
+table.merge_cells()
         
-table.to_excel(worksheet)
+print(table)
 
  # 保存工作簿
 workbook.save("output1.xlsx")
+
