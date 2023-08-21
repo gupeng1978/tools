@@ -1,4 +1,6 @@
 from openpyxl import Workbook
+import unittest
+
 
 class Table_Merge:
     def __init__(self, worksheet, table_info, sort_key_row_index):
@@ -107,12 +109,15 @@ class Table_Merge:
             allowed_seg_table = next_allowed_seg_table
     
     
-    def merge(self):
-        header_info = self.__table_info['header']
-        self.__merge_cells_by_row(header_info['row_start'], header_info['row_end'])
-        self.__merge_cells_by_col(header_info['row_start'], header_info['row_end'])
-        
-        record_info = self.__table_info['record']
-        self.__merge_cells_for_records(record_info['row_start'], record_info['row_end'])
+    def merge(self):        
+        if 'header' in self.__table_info:
+            header_info = self.__table_info['header']
+            self.__merge_cells_by_row(header_info['row_start'], header_info['row_end'])
+            self.__merge_cells_by_col(header_info['row_start'], header_info['row_end'])
+                
+       
+        if 'record' in self.__table_info:
+            record_info = self.__table_info['record']
+            self.__merge_cells_for_records(record_info['row_start'], record_info['row_end'])
         
  

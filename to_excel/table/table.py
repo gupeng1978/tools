@@ -156,74 +156,74 @@ class Table:
 
             
 
-# 示例
-header = Header()
-header.add(["model", "thread", "step","device_nn", "device_nn", "host_pcie_nn", "host_pcie_nn"])
-header.add(["model", "thread", "step","dev_ms",    "dev_fps",   "host_ms",      "host_fps"])
-header.set_active(1, ['model','thread'])
-header.set_alias({"model": "模型", 
-                  "thread": "线程数", 
-                  "step": "步骤", 
-                  "dev_ms": "时间(ms)", 
-                  "dev_fps": "帧率", 
-                  "host_ms": "时间(ms)", 
-                  "host_fps": "帧率",
-                  "device_nn":"device推理",
-                  "host_pcie_nn":"Host PCIe推理"})
+# # 示例
+# header = Header()
+# header.add(["model", "thread", "step","device_nn", "device_nn", "host_pcie_nn", "host_pcie_nn"])
+# header.add(["model", "thread", "step","dev_ms",    "dev_fps",   "host_ms",      "host_fps"])
+# header.set_active(1, ['model','thread'])
+# header.set_alias({"model": "模型", 
+#                   "thread": "线程数", 
+#                   "step": "步骤", 
+#                   "dev_ms": "时间(ms)", 
+#                   "dev_fps": "帧率", 
+#                   "host_ms": "时间(ms)", 
+#                   "host_fps": "帧率",
+#                   "device_nn":"device推理",
+#                   "host_pcie_nn":"Host PCIe推理"})
 
-print(header)
+# print(header)
 
-record = Record()
-# record.add_from_str("John, 25")
+# record = Record()
+# # record.add_from_str("John, 25")
 
-record.add_from_dict({"model": "resnet50", 
-                      "thread": '2', 
-                      "step" :  "dclmdlLoadFromFile",
-                      "dev_ms" : "2",
-                      "host_ms" : "1.59"})
+# record.add_from_dict({"model": "resnet50", 
+#                       "thread": '2', 
+#                       "step" :  "dclmdlLoadFromFile",
+#                       "dev_ms" : "2",
+#                       "host_ms" : "1.59"})
 
-record.add_from_dict({"model": "resnet50", 
-                      "thread": '1', 
-                      "step" :  "dclmdlLoadFromFile",
-                      "dev_ms" : "2.59",
-                      "host_ms" : "3.59"})
+# record.add_from_dict({"model": "resnet50", 
+#                       "thread": '1', 
+#                       "step" :  "dclmdlLoadFromFile",
+#                       "dev_ms" : "2.59",
+#                       "host_ms" : "3.59"})
 
-record.add_from_dict({"model": "resnet50", 
-                      "thread": '1', 
-                      "step" :  "copyH2D",
-                      "host_ms" : "0.5"})
+# record.add_from_dict({"model": "resnet50", 
+#                       "thread": '1', 
+#                       "step" :  "copyH2D",
+#                       "host_ms" : "0.5"})
 
-record.add_from_dict({"model": "resnet50", 
-                      "thread": '1', 
-                      "step" :  "copyD2H",
-                      "host_ms" : "1.5"})
+# record.add_from_dict({"model": "resnet50", 
+#                       "thread": '1', 
+#                       "step" :  "copyD2H",
+#                       "host_ms" : "1.5"})
 
-record.add_from_dict({"model": "yolov8", 
-                      "thread": '16', 
-                      "step" :  "copyD2H",
-                      "host_ms" : "3.5"})
+# record.add_from_dict({"model": "yolov8", 
+#                       "thread": '16', 
+#                       "step" :  "copyD2H",
+#                       "host_ms" : "3.5"})
 
-record.add_from_dict({"model": "resnet50", 
-                      "thread": '2', 
-                      "step" :  "copyH2D",
-                      "host_ms" : "0.5"})
+# record.add_from_dict({"model": "resnet50", 
+#                       "thread": '2', 
+#                       "step" :  "copyH2D",
+#                       "host_ms" : "0.5"})
 
-record.add_from_dict({"model": "resnet50", 
-                      "thread": '4', 
-                      "step" :  "copyD2H",
-                      "host_ms" : "3.5"})
+# record.add_from_dict({"model": "resnet50", 
+#                       "thread": '4', 
+#                       "step" :  "copyD2H",
+#                       "host_ms" : "3.5"})
 
-print(record)
+# print(record)
 
- # 创建一个工作簿和工作表
-workbook = Workbook()
-worksheet = workbook.active
+#  # 创建一个工作簿和工作表
+# workbook = Workbook()
+# worksheet = workbook.active
 
-table = Table(worksheet, header, record)
-table.merge_cells()
+# table = Table(worksheet, header, record)
+# table.merge_cells()
         
-print(table)
+# print(table)
 
- # 保存工作簿
-workbook.save("output1.xlsx")
+#  # 保存工作簿
+# workbook.save("output1.xlsx")
 
