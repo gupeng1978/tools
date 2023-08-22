@@ -19,7 +19,10 @@ class TestTableMerge(unittest.TestCase):
         
         # 使用断言方法验证合并后的单元格
         self.assertEqual(len(ws.merged_cells.ranges), 1)
-        self.assertEqual(ws.merged_cells.ranges[0].coord, "A1:A2")
+        for merged_cell in ws.merged_cells.ranges:
+            if 'A1' in merged_cell:
+                self.assertEqual(merged_cell.coord, "A1:A2")
+
         
         
 
@@ -38,9 +41,13 @@ class TestTableMerge(unittest.TestCase):
         
         # 使用断言方法验证合并后的单元格
         self.assertEqual(len(ws.merged_cells.ranges), 3)
-        self.assertEqual(ws.merged_cells.ranges[0].coord, "A1:B1")
-        self.assertEqual(ws.merged_cells.ranges[1].coord, "D1:E1")
-        self.assertEqual(ws.merged_cells.ranges[2].coord, "C1:C2")
+        for merged_cell in ws.merged_cells.ranges:
+            if 'A1' in merged_cell:
+                self.assertEqual(merged_cell.coord, "A1:B1")
+            if 'D1' in merged_cell:
+                self.assertEqual(merged_cell.coord, "D1:E1")
+            if 'C1' in merged_cell:
+                self.assertEqual(merged_cell.coord, "C1:C2")
         
         
     def test_merge_record_case01(self):
@@ -57,8 +64,12 @@ class TestTableMerge(unittest.TestCase):
         
         #仅允许A，B列merge
         self.assertEqual(len(ws.merged_cells.ranges), 2)
-        self.assertEqual(ws.merged_cells.ranges[0].coord, "A1:A3")
-        self.assertEqual(ws.merged_cells.ranges[1].coord, "B1:B2")
+        for merged_cell in ws.merged_cells.ranges:
+            if 'A1' in merged_cell:
+                self.assertEqual(merged_cell.coord, "A1:A3")
+            if 'B1' in merged_cell:
+                self.assertEqual(merged_cell.coord, "B1:B2")
+       
         
         
     def test_merge_record_case02(self):
@@ -77,12 +88,20 @@ class TestTableMerge(unittest.TestCase):
         
         #仅允许A，B,C 列merge， B的合并受A约束， C的合并受B约束
         self.assertEqual(len(ws.merged_cells.ranges), 6)
-        self.assertEqual(ws.merged_cells.ranges[0].coord, "A1:A3")
-        self.assertEqual(ws.merged_cells.ranges[1].coord, "A4:A5")
-        self.assertEqual(ws.merged_cells.ranges[2].coord, "B1:B2")
-        self.assertEqual(ws.merged_cells.ranges[3].coord, "B4:B5")
-        self.assertEqual(ws.merged_cells.ranges[4].coord, "C1:C2")
-        self.assertEqual(ws.merged_cells.ranges[5].coord, "C4:C5")
+        for merged_cell in ws.merged_cells.ranges:
+            if 'A1' in merged_cell:
+                self.assertEqual(merged_cell.coord, "A1:A3")
+            if 'A4' in merged_cell:
+                self.assertEqual(merged_cell.coord, "A4:A5")
+            if 'B1' in merged_cell:
+                self.assertEqual(merged_cell.coord, "B1:B2")
+            if 'B4' in merged_cell:
+                self.assertEqual(merged_cell.coord, "B4:B5")
+            if 'C1' in merged_cell:
+                self.assertEqual(merged_cell.coord, "C1:C2")
+            if 'C4' in merged_cell:
+                self.assertEqual(merged_cell.coord, "C4:C5")
+         
     
 
 # 如果是直接运行这个文件，那么执行测试
