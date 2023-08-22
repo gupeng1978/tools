@@ -167,3 +167,4 @@ cython_debug/
 
 *.xlsx
 *.xls
+test_*.yaml

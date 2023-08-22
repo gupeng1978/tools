@@ -1,5 +1,11 @@
 from openpyxl import Workbook
 from openpyxl.worksheet.worksheet import Worksheet
+from .table import Header, Record, Table
+import os
+import yaml
+
+
+TEMPLATE_CFG_FILE = os.path.join(os.path.dirname(__file__), '../data/template.yaml')
 
 class Sheet:
     def __init__(self, worksheet, name='Sheet1'):
@@ -24,3 +30,58 @@ class Sheet:
 
         # 使用换行符连接工作表名称、所有行和合并单元格的信息，构建一个完整的字符串
         return sheet_name_info + '\n' + '\n'.join(rows) + '\n' + merged_cells_info
+
+
+
+def get_default_config(output_file_path):
+    # 检查并创建输出目录（如果不存在）
+    output_directory = os.path.dirname(output_file_path)
+    if output_directory and not os.path.exists(output_directory):
+        os.makedirs(output_directory)
+        
+    with open(TEMPLATE_CFG_FILE, 'r', encoding='utf-8') as template_file:        
+        with open(output_file_path, 'w', encoding='utf-8') as output_file:            
+            for line in template_file:
+                output_file.write(line)
+                
+
+
+def gen_excel_table(config_file):
+    config = {}
+    excel_path = None
+    sheet_tags = None
+    # 检查文件是否存在
+    if not os.path.isfile(config_file):
+        raise ValueError(f"File {config_file} does not exist.")
+
+    # 尝试加载YAML内容以检查其有效性
+    try:
+        with open(config_file, 'r', encoding='utf-8') as file:
+            config = yaml.safe_load(file)
+    except yaml.YAMLError:
+        raise ValueError(f"File {config_file} is not a valid YAML file.")
+    
+    
+    # excel_path处理
+    excel_path = config.get('excel_path')
+    if not excel_path or not excel_path.endswith('.xlsx'):
+        raise ValueError(f"excel_path must be a .xlsx file. Got: {excel_path}")
+    if os.path.exists(excel_path) and not os.access(excel_path, os.W_OK):
+        raise ValueError(f"excel_path is not writable. Got: {excel_path}")
+    
+    # sheet处理
+    sheets = config.get('sheets')
+    if not isinstance(sheets, dict) or not isinstance(sheets.get('tag'), list) or not all(isinstance(item, str) for item in sheets.get('tag', [])):
+        raise ValueError("sheets must be a dictionary containing a 'tag' key with a list of strings.")
+    sheet_tags = sheets.get('tag')
+    
+    
+    # table处理    
+    tables = config.get('tables', [])
+    for table in tables:        
+        record_file = table.get('record_file')
+        if not record_file or not os.path.isfile(record_file) or not os.access(record_file, os.R_OK):     
+            table['record_file'] = os.path.join(os.path.dirname(__file__), table['record_file'])
+            record_file = table['record_file']
+            if not os.path.isfile(record_file) or not os.access(record_file, os.R_OK):    
+                raise ValueError(f"record_file must be a readable file. Got: {record_file}")
