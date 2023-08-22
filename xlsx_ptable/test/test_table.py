@@ -1,7 +1,7 @@
 import unittest
 from openpyxl import Workbook
 
-from table import Header, Record, Table, Sheet
+from ptable import Header, Record, Table, Sheet
 import os
 OUTPUT_DIR = os.path.join(os.path.dirname(__file__), '../data/')
 

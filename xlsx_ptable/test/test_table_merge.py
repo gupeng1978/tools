@@ -1,6 +1,6 @@
 import unittest
 from openpyxl import Workbook
-from table import Table_Merge, Sheet
+from ptable import Table_Merge, Sheet
 
 class TestTableMerge(unittest.TestCase):
     
