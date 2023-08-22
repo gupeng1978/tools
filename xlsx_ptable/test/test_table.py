@@ -2,6 +2,8 @@ import unittest
 from openpyxl import Workbook
 
 from table import Header, Record, Table, Sheet
+import os
+OUTPUT_DIR = os.path.join(os.path.dirname(__file__), '../data/')
 
 
 class TestTable(unittest.TestCase):
@@ -75,7 +77,7 @@ class TestTable(unittest.TestCase):
         print(Sheet(worksheet,"nnp perf"))
 
          # 保存工作簿
-        workbook.save("nnp-perf-case01.xlsx")
+        workbook.save(OUTPUT_DIR + "nnp-perf-case01.xlsx")
         
         
     def test_table_case02(self):
@@ -145,7 +147,7 @@ class TestTable(unittest.TestCase):
         print(Sheet(worksheet,"ive perf"))
 
          # 保存工作簿
-        workbook.save("ive-perf-case02.xlsx")
+        workbook.save(OUTPUT_DIR + "ive-perf-case02.xlsx")
 
    
     def test_table_case03(self):
@@ -221,7 +223,7 @@ class TestTable(unittest.TestCase):
         print(Sheet(worksheet,"ive perf"))
 
          # 保存工作簿
-        workbook.save("ive-perf-case03.xlsx")
+        workbook.save(OUTPUT_DIR + "ive-perf-case03.xlsx")
 
 # 如果是直接运行这个文件，那么执行测试
 if __name__ == '__main__':

@@ -1,9 +1,14 @@
 from openpyxl import Workbook
+from openpyxl.worksheet.worksheet import Worksheet
 
 class Sheet:
     def __init__(self, worksheet, name='Sheet1'):
+        if not isinstance(worksheet, Worksheet):
+            raise TypeError("worksheet must be an instance of openpyxl.worksheet.worksheet.Worksheet")
+
         self.__sheet = worksheet
         self.__name = name
+
 
     def __str__(self):
         # 添加工作表名称
