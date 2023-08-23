@@ -63,11 +63,11 @@ class TestTable(unittest.TestCase):
 
         print(record)
 
-         # 创建一个工作簿和工作表
+        # 创建一个工作簿和工作表
         workbook = Workbook()
         worksheet = workbook.active
 
-        table = Table(worksheet, header, record)
+        table = Table('#tab1', worksheet, header, record)
         table.merge_cells()
         table.set_attrs()
         
@@ -120,26 +120,26 @@ class TestTable(unittest.TestCase):
                               "h2d_size" : '2', 
                               "h2d_time" : '2.887', 
                               "ave_bw" : '692.76'})
-        record.add_from_str("""---demo : add record by logs
-                            ($1@Resize),(in.format@YUV400),(in.res@640x480),(out.format@YUV400),(out.res@224x224),($d1.fps@18969.5),($d1.rate@100),($d1_copy.fps@18468),($d1_copy.rate@99),(h2d_size@0.29),(h2d_time@0.63)
+        record.add_from_str("#tab1", """---demo : add record by logs
+                            #tab1: ($1@Resize),(in.format@YUV400),(in.res@640x480),(out.format@YUV400),(out.res@224x224),($d1.fps@18969.5),($d1.rate@100),($d1_copy.fps@18468),($d1_copy.rate@99),(h2d_size@0.29),(h2d_time@0.63)
                             ....
-                            ($1@Resize),(in.format@RGB_PLANAR),(in.res@1920x1080),(out.format@YUV400),(out.res@224x224),  ($d1.fps@2690.19),($d1.rate@100),($d1_copy.fps@853.268),($d1_copy.rate@35),(h2d_size@5.93),(h2d_time@7.715)
-                            ($1@Resize),(in.format@RGB_PLANAR),(in.res@256x256),(out.format@YUV400),  (out.res@1024x1024),($d1.fps@947.92), ($d1.rate@100),($d1_copy.fps@946.962),($d1_copy.rate@100),(h2d_size@0.1875),(h2d_time@0.484)
-                            ($1@Resize),(in.format@RGB_PLANAR),(in.res@1920x1080),(out.format@YUV400),(out.res@1024x1024),($d1.fps@545.703),($d1.rate@100),($d1_copy.fps@503.539),($d1_copy.rate@98),(h2d_size@5.93),(h2d_time@7.683)
-                            ($1@Resize),(in.format@RGB_PLANAR),(in.res@1920x1080),(out.format@YUV400),(out.res@2048x2048),($d1.fps@237.727),($d1.rate@100),($d1_copy.fps@226.873),($d1_copy.rate@100),(h2d_size@5.93),(h2d_time@7.683)
-                            ($1@Resize),(in.format@RGB_PLANAR),(in.res@3840x2160),(out.format@YUV400),(out.res@1024x1024),($d1.fps@290.252),($d1.rate@100),($d1_copy.fps@189.045),($d1_copy.rate@72),(h2d_size@23.95),(h2d_time@29.821)
-                            ($1@Resize),(in.format@RGB_PLANAR),(in.res@3840x2160),(out.format@YUV400),(out.res@2048x2048),($d1.fps@139.121),($d1.rate@100),($d1_copy.fps@128.14), ($d1_copy.rate@98),(h2d_size@23.95),(h2d_time@29.821)
+                            #tab1: ($1@Resize),(in.format@RGB_PLANAR),(in.res@1920x1080),(out.format@YUV400),(out.res@224x224),  ($d1.fps@2690.19),($d1.rate@100),($d1_copy.fps@853.268),($d1_copy.rate@35),(h2d_size@5.93),(h2d_time@7.715)
+                            #tab1: ($1@Resize),(in.format@RGB_PLANAR),(in.res@256x256),(out.format@YUV400),  (out.res@1024x1024),($d1.fps@947.92), ($d1.rate@100),($d1_copy.fps@946.962),($d1_copy.rate@100),(h2d_size@0.1875),(h2d_time@0.484)
+                            #tab1: ($1@Resize),(in.format@RGB_PLANAR),(in.res@1920x1080),(out.format@YUV400),(out.res@1024x1024),($d1.fps@545.703),($d1.rate@100),($d1_copy.fps@503.539),($d1_copy.rate@98),(h2d_size@5.93),(h2d_time@7.683)
+                            #tab1: ($1@Resize),(in.format@RGB_PLANAR),(in.res@1920x1080),(out.format@YUV400),(out.res@2048x2048),($d1.fps@237.727),($d1.rate@100),($d1_copy.fps@226.873),($d1_copy.rate@100),(h2d_size@5.93),(h2d_time@7.683)
+                            #tab1: ($1@Resize),(in.format@RGB_PLANAR),(in.res@3840x2160),(out.format@YUV400),(out.res@1024x1024),($d1.fps@290.252),($d1.rate@100),($d1_copy.fps@189.045),($d1_copy.rate@72),(h2d_size@23.95),(h2d_time@29.821)
+                            #tab1: ($1@Resize),(in.format@RGB_PLANAR),(in.res@3840x2160),(out.format@YUV400),(out.res@2048x2048),($d1.fps@139.121),($d1.rate@100),($d1_copy.fps@128.14), ($d1_copy.rate@98),(h2d_size@23.95),(h2d_time@29.821)
                             ...
-                            ($1@CvtColor),(in.format@YUV420),(in.res@1920x1080),(out.format@RGB_PLANAR/RGB_PACKED/YUV444),(out.res@1920x1080),($d1.fps@480.366),($d1.rate@100),($d1_copy.fps@480.282), ($d1_copy.rate@100),(h2d_size@3),(h2d_time@4.097)
-                            ($1@CvtColor),(in.format@YUV420),(in.res@1280x720), (out.format@RGB_PLANAR/RGB_PACKED/YUV444),(out.res@1280x720),($d1.fps@1082.6),($d1.rate@100),($d1_copy.fps@1080.55), ($d1_copy.rate@100),(h2d_size@1.32),(h2d_time@2.044)
-                            ($1@CvtColor),(in.format@YUV420),(in.res@640x480),  (out.format@RGB_PLANAR/RGB_PACKED/YUV444),(out.res@640x480),($d1.fps@3237.86),($d1.rate@98),($d1_copy.fps@3231.45), ($d1_copy.rate@100),(h2d_size@0.44),(h2d_time@0.851)
+                            #tab1: ($1@CvtColor),(in.format@YUV420),(in.res@1920x1080),(out.format@RGB_PLANAR/RGB_PACKED/YUV444),(out.res@1920x1080),($d1.fps@480.366),($d1.rate@100),($d1_copy.fps@480.282), ($d1_copy.rate@100),(h2d_size@3),(h2d_time@4.097)
+                            #tab1: ($1@CvtColor),(in.format@YUV420),(in.res@1280x720), (out.format@RGB_PLANAR/RGB_PACKED/YUV444),(out.res@1280x720),($d1.fps@1082.6),($d1.rate@100),($d1_copy.fps@1080.55), ($d1_copy.rate@100),(h2d_size@1.32),(h2d_time@2.044)
+                            #tab1: ($1@CvtColor),(in.format@YUV420),(in.res@640x480),  (out.format@RGB_PLANAR/RGB_PACKED/YUV444),(out.res@640x480),($d1.fps@3237.86),($d1.rate@98),($d1_copy.fps@3231.45), ($d1_copy.rate@100),(h2d_size@0.44),(h2d_time@0.851)
                             """)
 
          # 创建一个工作簿和工作表
         workbook = Workbook()
         worksheet = workbook.active
 
-        table = Table(worksheet, header, record)
+        table = Table('#tab1', worksheet, header, record)
         table.merge_cells()
         table.set_attrs()        
                        
@@ -192,30 +192,30 @@ class TestTable(unittest.TestCase):
                               "ave_bw" : '692.76'})
         
         # 乱序排放，验证排序和合并是否准确
-        record.add_from_str("""---demo : add record by logs
-                            ($1@Resize),(in.format@YUV400),(in.res@640x480),(out.format@YUV400),(out.res@224x224),($d1.fps@18969.5),($d1.rate@100),($d1_copy.fps@18468),($d1_copy.rate@99),(h2d_size@0.29),(h2d_time@0.63)
+        record.add_from_str("#tab1", """---demo : add record by logs
+                            #tab1: ($1@Resize),(in.format@YUV400),(in.res@640x480),(out.format@YUV400),(out.res@224x224),($d1.fps@18969.5),($d1.rate@100),($d1_copy.fps@18468),($d1_copy.rate@99),(h2d_size@0.29),(h2d_time@0.63)
                             ....
-                            ($1@Resize),(in.format@RGB_PLANAR),(in.res@1920x1080),(out.format@YUV400),(out.res@224x224),  ($d1.fps@2690.19),($d1.rate@100),($d1_copy.fps@853.268),($d1_copy.rate@35),(h2d_size@5.93),(h2d_time@7.715)
-                            ($1@CvtColor),(in.format@YUV420),(in.res@1280x720), (out.format@RGB_PLANAR/RGB_PACKED/YUV444),(out.res@1280x720),($d1.fps@1082.6),($d1.rate@100),($d1_copy.fps@1080.55), ($d1_copy.rate@100),(h2d_size@1.32),(h2d_time@2.044)
+                            #tab1: ($1@Resize),(in.format@RGB_PLANAR),(in.res@1920x1080),(out.format@YUV400),(out.res@224x224),  ($d1.fps@2690.19),($d1.rate@100),($d1_copy.fps@853.268),($d1_copy.rate@35),(h2d_size@5.93),(h2d_time@7.715)
+                            #tab1: ($1@CvtColor),(in.format@YUV420),(in.res@1280x720), (out.format@RGB_PLANAR/RGB_PACKED/YUV444),(out.res@1280x720),($d1.fps@1082.6),($d1.rate@100),($d1_copy.fps@1080.55), ($d1_copy.rate@100),(h2d_size@1.32),(h2d_time@2.044)
                             ...
                             ...
-                            ($1@Resize),(in.format@RGB_PLANAR),(in.res@256x256),(out.format@YUV400),  (out.res@1024x1024),($d1.fps@947.92), ($d1.rate@100),($d1_copy.fps@946.962),($d1_copy.rate@100),(h2d_size@0.1875),(h2d_time@0.484)
-                            ($1@Resize),(in.format@RGB_PLANAR),(in.res@1920x1080),(out.format@YUV400),(out.res@1024x1024),($d1.fps@545.703),($d1.rate@100),($d1_copy.fps@503.539),($d1_copy.rate@98),(h2d_size@5.93),(h2d_time@7.683)
+                            #tab1: ($1@Resize),(in.format@RGB_PLANAR),(in.res@256x256),(out.format@YUV400),  (out.res@1024x1024),($d1.fps@947.92), ($d1.rate@100),($d1_copy.fps@946.962),($d1_copy.rate@100),(h2d_size@0.1875),(h2d_time@0.484)
+                            #tab1: ($1@Resize),(in.format@RGB_PLANAR),(in.res@1920x1080),(out.format@YUV400),(out.res@1024x1024),($d1.fps@545.703),($d1.rate@100),($d1_copy.fps@503.539),($d1_copy.rate@98),(h2d_size@5.93),(h2d_time@7.683)
                             ...
-                            ($1@CvtColor),(in.format@YUV420),(in.res@1920x1080),(out.format@RGB_PLANAR/RGB_PACKED/YUV444),(out.res@1920x1080),($d1.fps@480.366),($d1.rate@100),($d1_copy.fps@480.282), ($d1_copy.rate@100),(h2d_size@3),(h2d_time@4.097)
+                            #tab1: ($1@CvtColor),(in.format@YUV420),(in.res@1920x1080),(out.format@RGB_PLANAR/RGB_PACKED/YUV444),(out.res@1920x1080),($d1.fps@480.366),($d1.rate@100),($d1_copy.fps@480.282), ($d1_copy.rate@100),(h2d_size@3),(h2d_time@4.097)
                             ...
-                            ($1@Resize),(in.format@RGB_PLANAR),(in.res@1920x1080),(out.format@YUV400),(out.res@2048x2048),($d1.fps@237.727),($d1.rate@100),($d1_copy.fps@226.873),($d1_copy.rate@100),(h2d_size@5.93),(h2d_time@7.683)
-                            ($1@Resize),(in.format@RGB_PLANAR),(in.res@3840x2160),(out.format@YUV400),(out.res@1024x1024),($d1.fps@290.252),($d1.rate@100),($d1_copy.fps@189.045),($d1_copy.rate@72),(h2d_size@23.95),(h2d_time@29.821)
-                            ($1@Resize),(in.format@RGB_PLANAR),(in.res@3840x2160),(out.format@YUV400),(out.res@2048x2048),($d1.fps@139.121),($d1.rate@100),($d1_copy.fps@128.14), ($d1_copy.rate@98),(h2d_size@23.95),(h2d_time@29.821)
+                            #tab1: ($1@Resize),(in.format@RGB_PLANAR),(in.res@1920x1080),(out.format@YUV400),(out.res@2048x2048),($d1.fps@237.727),($d1.rate@100),($d1_copy.fps@226.873),($d1_copy.rate@100),(h2d_size@5.93),(h2d_time@7.683)
+                            #tab1: ($1@Resize),(in.format@RGB_PLANAR),(in.res@3840x2160),(out.format@YUV400),(out.res@1024x1024),($d1.fps@290.252),($d1.rate@100),($d1_copy.fps@189.045),($d1_copy.rate@72),(h2d_size@23.95),(h2d_time@29.821)
+                            #tab1: ($1@Resize),(in.format@RGB_PLANAR),(in.res@3840x2160),(out.format@YUV400),(out.res@2048x2048),($d1.fps@139.121),($d1.rate@100),($d1_copy.fps@128.14), ($d1_copy.rate@98),(h2d_size@23.95),(h2d_time@29.821)
                             ...
-                            ($1@CvtColor),(in.format@YUV420),(in.res@640x480),  (out.format@RGB_PLANAR/RGB_PACKED/YUV444),(out.res@640x480),($d1.fps@3237.86),($d1.rate@98),($d1_copy.fps@3231.45), ($d1_copy.rate@100),(h2d_size@0.44),(h2d_time@0.851)
+                            #tab1: ($1@CvtColor),(in.format@YUV420),(in.res@640x480),  (out.format@RGB_PLANAR/RGB_PACKED/YUV444),(out.res@640x480),($d1.fps@3237.86),($d1.rate@98),($d1_copy.fps@3231.45), ($d1_copy.rate@100),(h2d_size@0.44),(h2d_time@0.851)
                             """)
 
          # 创建一个工作簿和工作表
         workbook = Workbook()
         worksheet = workbook.active
 
-        table = Table(worksheet, header, record)
+        table = Table('#tab1', worksheet, header, record)
         table.merge_cells()
         table.set_attrs()        
                        

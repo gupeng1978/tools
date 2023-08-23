@@ -69,19 +69,45 @@ def gen_excel_table(config_file):
     if os.path.exists(excel_path) and not os.access(excel_path, os.W_OK):
         raise ValueError(f"excel_path is not writable. Got: {excel_path}")
     
+    # 创建一个工作簿和工作表
+    workbook = Workbook()
+    
     # sheet处理
     sheets = config.get('sheets')
     if not isinstance(sheets, dict) or not isinstance(sheets.get('tag'), list) or not all(isinstance(item, str) for item in sheets.get('tag', [])):
         raise ValueError("sheets must be a dictionary containing a 'tag' key with a list of strings.")
-    sheet_tags = sheets.get('tag')
+    
+    
+    excel_sheets = {}
+    for sheet_tag in sheets['tag']:        
+        excel_sheets[sheet_tag] = workbook.create_sheet(title=sheet_tag)            
+        
     
     
     # table处理    
     tables = config.get('tables', [])
-    for table in tables:        
+    for table in tables:
+        if 'name' not in table:
+            raise ValueError(f"{config_file} failed, no table name")
+        
+        # table 的sheet tag处理
+        if 'sheet_tag' not in table:
+            raise ValueError(f"{config_file} failed,  no table sheet tag")
+        
+        if table['sheet_tag'] not in sheets['tag']:
+            raise ValueError(f"{config_file} failed,  table sheet is not a valid sheet name, sheets = {table['sheet_tag']}")
+        
+        table_sheet = excel_sheets[table['sheet_tag']]
+        
+        #header 处理
+        header = Header()
+        
+        # record 处理      
         record_file = table.get('record_file')
         if not record_file or not os.path.isfile(record_file) or not os.access(record_file, os.R_OK):     
             table['record_file'] = os.path.join(os.path.dirname(__file__), table['record_file'])
             record_file = table['record_file']
             if not os.path.isfile(record_file) or not os.access(record_file, os.R_OK):    
                 raise ValueError(f"record_file must be a readable file. Got: {record_file}")
+
+    

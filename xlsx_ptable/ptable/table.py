@@ -54,16 +54,18 @@ class Record:
         
     # 解析字符串获取类似(key@value)的字典
     @staticmethod
-    def __parse_line(line):
+    def __parse_line(line, tag_name):
+        if tag_name not in line:
+            return {}
         pattern = r'\(([^@]+)@([^)]+)\)'
         matches = re.findall(pattern, line)
         return {key: value for key, value in matches} 
 
-    def add_from_str(self, record_str):
+    def add_from_str(self, tag_name, record_str):
         if isinstance(record_str, str):
             lines = record_str.split('\n')
             for line in lines:
-                one = Record.__parse_line(line)
+                one = Record.__parse_line(line, tag_name)
                 if one:
                     self.records.append(one)
 
@@ -82,7 +84,7 @@ class Record:
 
 
 class Table:
-    def __init__(self, worksheet, header, record):
+    def __init__(self, name_tag, worksheet, header, record):
         if not isinstance(header, Header) or not isinstance(record, Record):
             raise TypeError("header and record must be Header and Record objects respectively.")
         self.__worksheet = worksheet
@@ -90,6 +92,7 @@ class Table:
         self.__record = record       
         self.__table_info = {'header' : {'row_start':None, 'row_end':None}, 'record' : {'row_start':None, 'row_end':None}}        
         self.__sort_key_row_index = None
+        self.__name_tag = name_tag
         
         
         # replace the header name with alias name
