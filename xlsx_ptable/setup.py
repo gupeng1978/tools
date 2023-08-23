@@ -3,6 +3,11 @@ from ptable import __version__
 
 
 print(__version__)
+
+# 读取README.md文件内容
+with open("README.md", "r", encoding="utf-8") as fh:
+    long_description = fh.read()
+    
 setup(
     name='xlsx_ptable',
     version=__version__,
@@ -15,6 +20,8 @@ setup(
     author='Peng Gu',
     author_email='gu.peng@intellif.com',
     description='Extract information from log files and create Excel spreadsheets.',
+    long_description=long_description,
+    long_description_content_type="text/markdown",
     url='https://github.com/gupeng1978/tools',
     classifiers=[
         'Development Status :: 3 - Alpha',

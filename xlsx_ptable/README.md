@@ -1,6 +1,6 @@
 # xlsx_ptable python包介绍
 
-xlsx_ptable Python Package是一个用于基于用户log文件，并根据配置文件生成excel表格的python库。它可以帮助你生成优雅的Excel表格。
+xlsx_ptable Python Package是一个基于用户log文件，并根据配置文件生成excel表格的python库。它可以帮助你生成优雅的Excel表格。
 
 ## 安装
 
@@ -55,6 +55,7 @@ gen_excel_table("user.cfg")
 ```
 
 输出excel表格为:
+
 | 表头1 |           |表头2    | 表头3    |
 |-------|----------|----------|----------|
 | X1    | X2       |          |
@@ -87,3 +88,16 @@ gen_excel_table("user.cfg")
 7. **head-key**为关键key，所有表格记录会基于该key，在列方向上排序以及合并;
 8. 支持单个log存放多个table 记录;
 
+
+## Sample
+更多sample，请访问[xlsx_ptable](https://github.com/gupeng1978/tools/tree/main/xlsx_ptable/sample)。
+
+## 贡献
+欢迎任何形式的贡献！请阅读我们的贡献指南了解如何开始。
+
+##  许可
+根据MIT许可证发布。
+
+## 问题和建议
+如果你有任何问题或建议，请通过邮箱gu.peng@intelllif.com联系或者
+请[在此提出Issue](https://github.com/gupeng1978/tools/issues)。

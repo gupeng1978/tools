@@ -1,0 +1,10 @@
+%tab1: (X1@1), (X2@a), (Y@sample y1), (Z@sample z1)
+.............
+%tab1: (X1@2), (X2@), (Y@sample y2), (Z@sample z2)
+.............
+%tab1: (X1@3), (Z@sample z3)
+%tab1: (X1@4), (X2@c), (Y@sample y3), (Z@sample z4)
+%tab1: (X1@4), (X2@d), (Y@sample y4),
+%tab1: (X1@5), (X2@e), (Y@sample y5), (Z@sample z5)
+.............
+%tab1: (X1@5), (X2@f), (Y@sample y6), (Z@sample z6)
