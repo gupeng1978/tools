@@ -72,6 +72,10 @@ def gen_excel_table(config_file):
     # 创建一个工作簿和工作表
     workbook = Workbook()
     
+    # 删除缺省sheet
+    workbook.remove(workbook.active)
+
+    
     # sheet处理
     sheets = config.get('sheets')
     if not isinstance(sheets, dict) or not isinstance(sheets.get('tag'), list) or not all(isinstance(item, str) for item in sheets.get('tag', [])):
@@ -95,14 +99,29 @@ def gen_excel_table(config_file):
             raise ValueError(f"{config_file} failed,  no table sheet tag")
         
         if table['sheet_tag'] not in sheets['tag']:
-            raise ValueError(f"{config_file} failed,  table sheet is not a valid sheet name, sheets = {table['sheet_tag']}")
-        
+            raise ValueError(f"{config_file} failed,  table sheet is not a valid sheet name, sheets = {table['sheet_tag']}")        
         table_sheet = excel_sheets[table['sheet_tag']]
         
         #header 处理
         header = Header()
+        if 'head-key' not in table:
+            raise ValueError(f"{config_file} failed,  no table head-key")
         
-        # record 处理      
+        if 'head-0' in table:
+            header.add(table['head-0'])
+        else:
+            raise ValueError(f"{config_file} failed,  no table head-0")
+        
+        if 'head-1' in table:
+            header.add(table['head-1'])
+            header.set_active(1, table['head-key'])
+        else:
+            header.set_active(0, table['head-key'])
+            
+        if 'alias' in table:
+            header.set_alias(table['alias'])
+                
+        # record 处理        
         record_file = table.get('record_file')
         if not record_file or not os.path.isfile(record_file) or not os.access(record_file, os.R_OK):     
             table['record_file'] = os.path.join(os.path.dirname(__file__), table['record_file'])
@@ -110,4 +129,15 @@ def gen_excel_table(config_file):
             if not os.path.isfile(record_file) or not os.access(record_file, os.R_OK):    
                 raise ValueError(f"record_file must be a readable file. Got: {record_file}")
 
+        record = Record() 
+        record.add_from_file(table['name'], record_file)
+        
+        table = Table(table['name'], table_sheet, header, record)
+        table.merge_cells()
+        table.set_attrs()
+        
+        print(Sheet(table_sheet))
     
+    
+    # 保存工作簿
+    workbook.save(excel_path)

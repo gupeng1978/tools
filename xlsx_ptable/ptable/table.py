@@ -1,5 +1,6 @@
 from openpyxl import Workbook
 import re
+import os
 from .table_merge import Table_Merge
 from .table_attr import Table_Attr
 
@@ -68,9 +69,20 @@ class Record:
                 one = Record.__parse_line(line, tag_name)
                 if one:
                     self.records.append(one)
-
         else:
             raise ValueError("参数必须是字符串")
+        
+    def add_from_file(self, tag_name, log_file):
+        # 检查log_file是否为可读文件
+        if not os.path.isfile(log_file) or not os.access(log_file, os.R_OK):
+            raise ValueError(f"log_file must be a readable file. Got: {log_file}")
+
+        # 打开文件并逐行读取
+        with open(log_file, 'r', encoding='utf-8') as file:
+            for line in file:
+                one = Record.__parse_line(line, tag_name)
+                if one:
+                    self.records.append(one)
 
     def add_from_dict(self, record_dict):
         if isinstance(record_dict, dict):
