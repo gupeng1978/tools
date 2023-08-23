@@ -131,6 +131,8 @@ def gen_excel_table(config_file):
 
         record = Record() 
         record.add_from_file(table['name'], record_file)
+        if not record.records:
+            raise ValueError(f"could not extract table record from  {record_file}, table_tag is {table['name']} ")
         
         table = Table(table['name'], table_sheet, header, record)
         table.merge_cells()
