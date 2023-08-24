@@ -60,7 +60,24 @@ class Record:
             return {}
         pattern = r'\(([^@]+)@([^)]+)\)'
         matches = re.findall(pattern, line)
-        return {key: value for key, value in matches} 
+        
+        result = {}
+        for key, value in matches:
+            # 尝试将 value 转换为整数
+            try:
+                value = int(value)
+            except ValueError:
+                # 如果无法转换为整数，则尝试转换为浮点数
+                try:
+                    value = float(value)
+                except ValueError:
+                    # 如果无法转换为浮点数，则保持为字符串
+                    pass
+            
+            result[key] = value
+
+        return result
+
 
     def add_from_str(self, tag_name, record_str):
         if isinstance(record_str, str):
@@ -145,7 +162,7 @@ class Table:
         sort_indexes = [record_keys.index(key) for key in sort_keys]
 
         # 根据sort_indexes对self.records进行排序
-        self.__record.records.sort(key=lambda record: [record[index] for index in sort_indexes])
+        self.__record.records.sort(key=lambda record: [str(record[index]) for index in sort_indexes])
         
         self.__sort_key_row_index = sort_indexes
     
