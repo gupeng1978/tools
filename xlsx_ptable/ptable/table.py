@@ -86,7 +86,9 @@ class Header:
                 input_formula['key'] = input
                 input_formula['excel_pos'] = __index_to_column(input_formula['index'])
                 forumla['inputs'].append(input_formula)
-                forumla['excel_formula'] = "="  + __replace_string(formula_str, "${" + input + "}", input_formula['excel_pos']+"#N")
+                formula_str = __replace_string(formula_str, "${" + input + "}", input_formula['excel_pos']+"#N")
+            
+            forumla['excel_formula'] = "="  + formula_str
                 
 
     def set_alias(self, alias_dict):
@@ -260,16 +262,31 @@ class Table:
             inputs_valid = True
             for input in formula['inputs']:
                 input_ind = input['index']
-                if record[input_ind] is None or isinstance(record[input_ind], (int, float)) is False:
+                # 输入为None，那么不用公式计算
+                if record[input_ind] is None:
                     inputs_valid = False
                     break
+                
+                 # 支持公式嵌套，允许cell A公式的输出做为cell B的公式输入                
+                if isinstance(record[input_ind], (int, float)) is False:
+                    if isinstance(record[input_ind], (str)) is True and not record[input_ind].startswith("="):
+                        inputs_valid = False
+                    break
             
-            # 只有输入有数值，且输出为空，那么才用公式计算
+            # 只有输入有数值、或者为公式，且输出为空，那么才用公式计算
             if inputs_valid and record[output_ind] is None:
                 record[output_ind] = formula['excel_formula'].replace("#N", str(row_num))
             pass
         
         return record
+    
+    @staticmethod
+    def __combine_two_records(record1, record2):
+        for k, v in record2.items():
+            if v is not None and k not in record1:
+                record1[k] = v
+        return record1
+        pass
        
     def __to_excel(self):        
         # 计算表格信息
@@ -296,24 +313,25 @@ class Table:
         if len(self.__records) > 1 and self.__header.hash_key is None:
             raise ValueError("多个record必须设置hash_key")
         
-        # # 把多个record对象的数据合并到第一个record对象中
-        first_record_obj = self.__records[0]        
-        for record in first_record_obj.records:            
-            pass
+        # 把多个record对象的数据合并到第一个record对象中
+        first_record_obj = self.__records[0]
+        if self.__header.hash_key:
+            others_record_obj = self.__records[1:]
+            for record in first_record_obj.records:
+                hash_val = hash(tuple(record[key] for key in self.__header.hash_key))
+                for other_record_obj in others_record_obj:
+                    for other_record in other_record_obj.records:
+                        other_hash_val = hash(tuple(other_record[key] for key in self.__header.hash_key))
+                        if hash_val == other_hash_val:
+                            record = Table.__combine_two_records(record, other_record)
+                            break
+                pass
         
-        # for index, record_obj in enumerate(self.__records):
-        #     if index == 0:
-        #         continue
-        #     self.__records[0].records.extend(record_obj.records)        
         
         
         # 以第一个记录表排序
         self.__expand_and_sort_by_keys(self.__records[0].records, self.__header.record_keys, self.__header.sort_keys)
         record_row_start = worksheet.max_row + 1
-        
-        # for index, record_obj in enumerate(self.__records):
-        #     if index == 0:
-                
 
         for record in self.__records[0].records:                
             record = self.__expand_record_by_formula(record, worksheet.max_row + 1, self.__header.formulas, self.__header.record_keys)

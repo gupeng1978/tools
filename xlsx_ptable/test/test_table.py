@@ -67,7 +67,7 @@ class TestTable(unittest.TestCase):
         workbook = Workbook()
         worksheet = workbook.active
 
-        table = Table('#tab1', worksheet, header, record)
+        table = Table('#tab1', worksheet, header, [record])
         table.merge_cells()
         table.set_attrs()
         
@@ -139,7 +139,7 @@ class TestTable(unittest.TestCase):
         workbook = Workbook()
         worksheet = workbook.active
 
-        table = Table('#tab1', worksheet, header, record)
+        table = Table('#tab1', worksheet, header, [record])
         table.merge_cells()
         table.set_attrs()        
                        
@@ -215,7 +215,7 @@ class TestTable(unittest.TestCase):
         workbook = Workbook()
         worksheet = workbook.active
 
-        table = Table('#tab1', worksheet, header, record)
+        table = Table('#tab1', worksheet, header, [record])
         table.merge_cells()
         table.set_attrs()        
                        
