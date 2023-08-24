@@ -118,6 +118,9 @@ def gen_excel_table(config_file):
         else:
             header.set_active(0, table['head-key'])
             
+        if 'head-formula' in table:
+            header.set_head_formula(table['head-formula'])
+            
         if 'alias' in table:
             header.set_alias(table['alias'])
                 

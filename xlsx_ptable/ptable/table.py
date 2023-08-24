@@ -11,6 +11,8 @@ class Header:
         self.aliases = {}
         self.header_col = 0
         self.record_keys = None
+        self.sort_keys = None
+        self.formulas = {}
 
     def add(self, header_list):       
         if isinstance(header_list, list) and all(isinstance(h, str) for h in header_list):
@@ -32,7 +34,59 @@ class Header:
             self.sort_keys = sort_keys
         else:
             raise ValueError("索引必须是有效的整数")
+        
+        
+    def set_head_formula(self, head_formula):
+        def __extract_patterns(input_string):
+            # 使用正则表达式匹配 ${...} 格式的字符串，并提取所有匹配项
+            patterns = re.findall(r'\$\{(.+?)\}', input_string)            
+            return patterns
+        
+        def __index_to_column(index):
+            if index < 0:
+                raise ValueError("Index must be a non-negative integer")            
+            # 将索引转换为 ASCII 值，其中 65 对应于 'A'
+            column_char = chr(index + 65)
+            return column_char
+        
+        def __replace_string(input_string, old_substring, new_substring):
+            # 删除所有空白字符
+            ss = ''.join(input_string.split())
 
+            # 使用 str.replace 方法替换所有匹配的子字符串
+            return ss.replace(old_substring, new_substring)
+
+    
+        # 检查 head_formula_list 是否为字典
+        if not isinstance(head_formula, dict):
+            raise TypeError("head_formula_list must be a dictionary")
+
+        # 检查字典的键和值是否都是字符串
+        for key, value in head_formula.items():
+            if not isinstance(key, str) or not isinstance(value, str):
+                raise TypeError("Both keys and values in the dictionary must be strings")
+            
+        if not self.record_keys:
+            raise TypeError("set_head_formula() depends on set_active().")
+       
+        for formula_result_key, formula_str in head_formula.items():
+            formula_inputs_key = __extract_patterns(formula_str)
+            self.formulas[formula_result_key] = { 'inputs' : [], 'excel_formula' : None }
+            forumla = self.formulas[formula_result_key]
+            
+            if formula_result_key not in self.record_keys:
+                raise ValueError("formula_result_key must be in record_keys")
+            
+            for input in formula_inputs_key:                
+                input_formula = {'index' : None, 'key' : None, 'excel_pos' : None}
+                if input not in self.record_keys:
+                    raise ValueError("formula_inputs_key must be in record_keys")
+                input_formula['index'] = self.record_keys.index(input)
+                input_formula['key'] = input
+                input_formula['excel_pos'] = __index_to_column(input_formula['index'])
+                forumla['inputs'].append(input_formula)
+                forumla['excel_formula'] = "="  + __replace_string(formula_str, "${" + input + "}", input_formula['excel_pos']+"#N")
+                
 
     def set_alias(self, alias_dict):
         if isinstance(alias_dict, dict) and all(isinstance(k, str) and isinstance(v, str) for k, v in alias_dict.items()):
@@ -187,7 +241,25 @@ class Table:
         # 使用换行符连接所有行，构建一个完整的字符串
         return '\n'.join(rows)    
     
-
+    @staticmethod
+    def __expand_record_by_formula(record, row_num, formulas, record_keys):
+        for formula_result_key, formula in formulas.items():
+            output_ind = record_keys.index(formula_result_key)            
+            
+            inputs_valid = True
+            for input in formula['inputs']:
+                input_ind = input['index']
+                if record[input_ind] is None or isinstance(record[input_ind], (int, float)) is False:
+                    inputs_valid = False
+                    break
+            
+            # 只有输入有数值，且输出为空，那么才用公式计算
+            if inputs_valid and record[output_ind] is None:
+                record[output_ind] = formula['excel_formula'].replace("#N", str(row_num))
+            pass
+        
+        return record
+       
     def __to_excel(self):        
         # 计算表格信息
         worksheet = self.__worksheet
@@ -213,6 +285,7 @@ class Table:
         # 将记录写入工作表
         self.__expand_and_sort_by_keys(self.__header.record_keys, self.__header.sort_keys)
         record_row_start = worksheet.max_row + 1
-        for record in self.__record.records:            
+        for record in self.__record.records:                
+            record = self.__expand_record_by_formula(record, worksheet.max_row + 1, self.__header.formulas, self.__header.record_keys)
             worksheet.append(record)
         record_row_end = worksheet.max_row

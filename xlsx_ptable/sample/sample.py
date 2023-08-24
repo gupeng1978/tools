@@ -14,3 +14,7 @@ gen_excel_table("sample3.cfg")
 
 # sample4： sample with 2 tables in one sheet
 gen_excel_table("sample4.cfg")
+
+
+# sample5： sample with formula
+gen_excel_table("sample5.cfg")
