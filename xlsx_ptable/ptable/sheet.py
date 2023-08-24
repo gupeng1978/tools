@@ -123,23 +123,38 @@ def gen_excel_table(config_file):
             
         if 'alias' in table:
             header.set_alias(table['alias'])
+            
+            
+        if 'head-hash-key' in table:
+            header.set_hash_key(table['head-hash-key'])
                 
         # record 处理        
-        record_file = table.get('record_file')
-        if not record_file or not os.path.isfile(record_file) or not os.access(record_file, os.R_OK):     
-            table['record_file'] = os.path.join(os.path.dirname(__file__), table['record_file'])
-            record_file = table['record_file']
-            if not os.path.isfile(record_file) or not os.access(record_file, os.R_OK):    
-                raise ValueError(f"record_file must be a readable file. Got: {record_file}")
-
-        record = Record() 
-        record.add_from_file(table['name'], record_file)
-        if not record.records:
-            raise ValueError(f"could not extract table record from  {record_file}, table_tag is {table['name']} ")
+        record_files = table.get('record_file')        
+        if not isinstance(record_files, list):
+            record_files = [record_files]            
         
-        table = Table(table['name'], table_sheet, header, record)
+        record_list = []
+        for record_file in record_files:
+            if not record_file or not os.path.isfile(record_file) or not os.access(record_file, os.R_OK):     
+                table['record_file'] = os.path.join(os.path.dirname(__file__), table['record_file'])
+                record_file = table['record_file']
+                if not os.path.isfile(record_file) or not os.access(record_file, os.R_OK):
+                    raise ValueError(f"record_file must be a readable file. Got: {record_file}")
+
+            record = Record() 
+            record.add_from_file(table['name'], record_file)
+            if not record.records:
+                raise ValueError(f"could not extract table record from  {record_file}, table_tag is {table['name']} ")
+            
+            record_list.append(record)
+        
+        # table处理
+        table = Table(table['name'], table_sheet, header, record_list)
         table.merge_cells()
         table.set_attrs()
+        pass
+        
+        
         
         # print(Sheet(table_sheet))
         

@@ -13,6 +13,7 @@ class Header:
         self.record_keys = None
         self.sort_keys = None
         self.formulas = {}
+        self.hash_key = None
 
     def add(self, header_list):       
         if isinstance(header_list, list) and all(isinstance(h, str) for h in header_list):
@@ -94,6 +95,16 @@ class Header:
         else:
             raise ValueError("字典的键和值必须是字符串")
         
+    def set_hash_key(self, hash_key):
+        if not isinstance(hash_key, list):
+            raise ValueError("hash_key 必须是列表") 
+        
+        for key in hash_key:
+            if key not in self.record_keys:
+                raise ValueError("hash_key 必须是record_keys的子集")
+        self.hash_key = hash_key
+        
+        
     def __str__(self):
         header_str = "Headers:\n" + "\n".join(", ".join(header) for header in self.headers)
         alias_str = "Aliases:\n" + "\n".join(f"{k}: {v}" for k, v in self.aliases.items())
@@ -167,12 +178,12 @@ class Record:
 
 
 class Table:
-    def __init__(self, name_tag, worksheet, header, record):
-        if not isinstance(header, Header) or not isinstance(record, Record):
+    def __init__(self, name_tag, worksheet, header, records):
+        if not isinstance(header, Header) or not isinstance(records, list):
             raise TypeError("header and record must be Header and Record objects respectively.")
         self.__worksheet = worksheet
         self.__header = header
-        self.__record = record       
+        self.__records = records       
         self.__table_info = {'first_table': True, 'col_width': 1, 'header' : {'row_start':None, 'row_end':None}, 'record' : {'row_start':None, 'row_end':None}}        
         self.__sort_key_row_index = None
         self.__name_tag = name_tag
@@ -191,13 +202,13 @@ class Table:
         self.__to_excel()
 
             
-    def __expand_and_sort_by_keys(self, record_keys, sort_keys):
+    def __expand_and_sort_by_keys(self, records, record_keys, sort_keys):
         # 检查sort_keys是否是record_keys的子集
         if not all(key in record_keys for key in sort_keys):
             raise ValueError("sort_keys必须是record_keys的子集")
         
         # expand
-        for index, record in enumerate(self.__record.records):
+        for index, record in enumerate(records):
             if isinstance(record, dict):
                 # 检查record的所有键是否都在record_keys中
                 if not all(key in record_keys for key in record.keys()):
@@ -207,7 +218,7 @@ class Table:
                 if any(not key in record.keys() for key in sort_keys):
                     raise ValueError("record的少关键key, record = {}, 关键keys = {}".format(record, sort_keys))
                 
-                self.__record.records[index] = [record.get(key, None) for key in record_keys]
+                records[index] = [record.get(key, None) for key in record_keys]
             else:
                 raise TypeError("记录必须是字典类型")
 
@@ -216,7 +227,7 @@ class Table:
         sort_indexes = [record_keys.index(key) for key in sort_keys]
 
         # 根据sort_indexes对self.records进行排序
-        self.__record.records.sort(key=lambda record: [str(record[index]) for index in sort_indexes])
+        records.sort(key=lambda record: [str(record[index]) for index in sort_indexes])
         
         self.__sort_key_row_index = sort_indexes
     
@@ -274,18 +285,37 @@ class Table:
             
         self.__table_info['header']['row_end'] = self.__table_info['header']['row_start'] + len(self.__header.headers) - 1
         self.__table_info['record']['row_start'] = self.__table_info['header']['row_end'] + 1
-        self.__table_info['record']['row_end'] = self.__table_info['record']['row_start'] + len(self.__record.records) - 1
+        self.__table_info['record']['row_end'] = self.__table_info['record']['row_start'] + len(self.__records[0].records) - 1
        
         # 将表头写入工作表        
         for header in self.__header.headers:
             worksheet.append(header) 
             self.__table_info['col_width'] = max( self.__table_info['col_width'], len(header) )
                
-
-        # 将记录写入工作表
-        self.__expand_and_sort_by_keys(self.__header.record_keys, self.__header.sort_keys)
+               
+        if len(self.__records) > 1 and self.__header.hash_key is None:
+            raise ValueError("多个record必须设置hash_key")
+        
+        # # 把多个record对象的数据合并到第一个record对象中
+        first_record_obj = self.__records[0]        
+        for record in first_record_obj.records:            
+            pass
+        
+        # for index, record_obj in enumerate(self.__records):
+        #     if index == 0:
+        #         continue
+        #     self.__records[0].records.extend(record_obj.records)        
+        
+        
+        # 以第一个记录表排序
+        self.__expand_and_sort_by_keys(self.__records[0].records, self.__header.record_keys, self.__header.sort_keys)
         record_row_start = worksheet.max_row + 1
-        for record in self.__record.records:                
+        
+        # for index, record_obj in enumerate(self.__records):
+        #     if index == 0:
+                
+
+        for record in self.__records[0].records:                
             record = self.__expand_record_by_formula(record, worksheet.max_row + 1, self.__header.formulas, self.__header.record_keys)
             worksheet.append(record)
         record_row_end = worksheet.max_row

@@ -1,0 +1,25 @@
+
+...table 1
+#tab_nnp: (model@resnet50), (thread@N), (step@dclmdlLoadFromFile),  (device.ms@3.5)
+#tab_nnp: (model@resnet50), (thread@1), (step@copyH2D),  (device.ms@2.4), 
+#tab_nnp: (model@resnet50), (thread@1), (step@copyD2H),  (device.ms@1.2),
+#tab_nnp: (model@resnet50), (thread@1), (step@dclmdlExecute),  (device.ms@3.0),
+#tab_nnp: (model@resnet50), (thread@2), (step@copyH2D),  (device.ms@3), 
+#tab_nnp: (model@resnet50), (thread@2), (step@copyD2H),  (device.ms@1.2),
+#tab_nnp: (model@resnet50), (thread@2), (step@dclmdlExecute),  (device.ms@1.3),
+#tab_nnp: (model@resnet50), (thread@4), (step@copyH2D),  (device.ms@1.8), 
+#tab_nnp: (model@resnet50), (thread@4), (step@copyD2H),  (device.ms@3.1),
+#tab_nnp: (model@resnet50), (thread@4), (step@dclmdlExecute),  (device.ms@2.6),
+...
+....
+#tab_nnp: (model@mobileNet-V2), (thread@N), (step@dclmdlLoadFromFile),  (device.ms@1.5)
+#tab_nnp: (model@mobileNet-V2), (thread@1), (step@copyH2D),  (device.ms@2.8), 
+#tab_nnp: (model@mobileNet-V2), (thread@1), (step@copyD2H),  (device.ms@3.2),
+#tab_nnp: (model@mobileNet-V2), (thread@1), (step@dclmdlExecute),  (device.ms@2.0),
+#tab_nnp: (model@mobileNet-V2), (thread@2), (step@copyH2D),  (device.ms@4), 
+#tab_nnp: (model@mobileNet-V2), (thread@2), (step@copyD2H),  (device.ms@0.2),
+#tab_nnp: (model@mobileNet-V2), (thread@2), (step@dclmdlExecute),  (device.ms@1.3),
+#tab_nnp: (model@mobileNet-V2), (thread@4), (step@copyH2D),  (device.ms@2.8), 
+#tab_nnp: (model@mobileNet-V2), (thread@4), (step@copyD2H),  (device.ms@3.9),
+#tab_nnp: (model@mobileNet-V2), (thread@4), (step@dclmdlExecute),  (device.ms@1.6),
+...
