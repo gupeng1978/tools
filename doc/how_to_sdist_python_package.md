@@ -36,6 +36,23 @@ twine upload dist/*
 ```
 你将被提示输入你的PyPI用户名和密码。
 
+如果需要两因素身份验证（2FA），那么在增加$HOME/.pypirc配置文件:
+```
+[distutils]
+  index-servers =
+    pypi
+    PROJECT_NAME
+
+[pypi]
+  username = __token__
+  password = pypi-XXXX
+
+[PROJECT_NAME]
+  repository = https://upload.pypi.org/legacy/
+  username = __token__
+  password = pypi-XXX
+```
+
 ### 6. 测试你的包
 你可以使用以下命令安装你的包，确保一切正常：
 ```bash
