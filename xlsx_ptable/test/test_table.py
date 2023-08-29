@@ -224,6 +224,40 @@ class TestTable(unittest.TestCase):
 
          # 保存工作簿
         workbook.save(OUTPUT_DIR + "ive-perf-case03.xlsx")
+        
+    def test_table_case04(self):
+        header = Header()
+        header.add(["in","size"])      
+        header.set_active(0, ['in'])  
+        
+        record = Record()        
+        record.add_from_str("#tab1", """---demo : add record by logs
+                            #tab1: (in@1000000),    (size@1024)
+                            #tab1: (in@100000),     (size@4096)
+                            #tab1: (in@10000),      (size@65536)
+                            #tab1: (in@1000),       (size@524288)
+                            #tab1: (in@100),        (size@1048576)
+                            #tab1: (in@10),         (size@4194304)
+                            #tab1: (in@1),          (size@8388608)
+                            #tab1: (in@10),         (size@33554432)
+                            #tab1: (in@100),        (size@8388608)
+                            #tab1: (in@1000),       (size@1048576)
+                            #tab1: (in@10000),      (size@65536)                           
+                            """)
+
+         # 创建一个工作簿和工作表
+        workbook = Workbook()
+        worksheet = workbook.active
+
+        table = Table('#tab1', worksheet, header, [record])
+        table.merge_cells()
+        table.set_attrs()        
+                       
+        print(table)        
+        print(Sheet(worksheet,"number-align"))
+
+         # 保存工作簿
+        workbook.save(OUTPUT_DIR + "number-align-case04.xlsx")
 
 # 如果是直接运行这个文件，那么执行测试
 if __name__ == '__main__':

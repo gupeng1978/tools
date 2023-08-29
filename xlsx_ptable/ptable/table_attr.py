@@ -64,6 +64,13 @@ class Table_Attr:
         # 遍历指定行范围的所有单元格
         for row in self.__worksheet.iter_rows(min_row=row_start, max_row=row_end, min_col=col_start, max_col=col_end, values_only=True):
             for col_index, cell_value in enumerate(row):
+                # 如果单元格的值是数字，则计算其字符宽度
+                if isinstance(cell_value, (int, float)):
+                    # 使用自定义函数计算数字宽度
+                    string_width = self.__calculate_string_width(str(cell_value))
+                    # 更新该列的最大字符宽度
+                    max_col_widths[col_index] = max(max_col_widths[col_index], string_width)    
+                    
                 # 如果单元格的值是字符串，则计算其字符宽度
                 if isinstance(cell_value, str):
                     # 使用自定义函数计算字符串宽度
