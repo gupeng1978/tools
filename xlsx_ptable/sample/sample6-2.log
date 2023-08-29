@@ -1,6 +1,6 @@
 
 ...table 1
-#tab_nnp: (model@resnet50), (thread@N), (step@dclmdlLoadFromFile),  (pcie.ms@5.5)
+#tab_nnp: (model@resnet50), (thread@0), (step@dclmdlLoadFromFile),  (pcie.ms@5.5)
 #tab_nnp: (model@resnet50), (thread@1), (step@copyH2D),  (pcie.ms@6.4), 
 #tab_nnp: (model@resnet50), (thread@1), (step@copyD2H),  (pcie.ms@8.2),
 #tab_nnp: (model@resnet50), (thread@1), (step@dclmdlExecute),  (pcie.ms@4.0),
@@ -12,7 +12,7 @@
 #tab_nnp: (model@resnet50), (thread@4), (step@dclmdlExecute),  (pcie.ms@5.6),
 ...
 ....
-#tab_nnp: (model@mobileNet-V2), (thread@N), (step@dclmdlLoadFromFile),  (pcie.ms@3.5)
+#tab_nnp: (model@mobileNet-V2), (thread@0), (step@dclmdlLoadFromFile),  (pcie.ms@3.5)
 #tab_nnp: (model@mobileNet-V2), (thread@1), (step@copyH2D),  (pcie.ms@6.8), 
 #tab_nnp: (model@mobileNet-V2), (thread@1), (step@copyD2H),  (pcie.ms@4.2),
 #tab_nnp: (model@mobileNet-V2), (thread@1), (step@dclmdlExecute),  (pcie.ms@5.0),
