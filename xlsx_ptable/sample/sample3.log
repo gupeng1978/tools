@@ -20,7 +20,7 @@
 ...
 ...
 ... table 2
-#tab_nnp: (model@resnet50), (thread@0), (step@dclmdlLoadFromFile),  (device.ms@3.5),(pcie.ms@4.2)
+#tab_nnp: (model@resnet50), (thread@N), (step@dclmdlLoadFromFile),  (device.ms@3.5),(pcie.ms@4.2)
 #tab_nnp: (model@resnet50), (thread@1), (step@dclmdlExecute),  (device.ms@2.594), (device.fps@385.9)
 #tab_nnp: (model@resnet50), (thread@1), (step@copyH2D),  (device.ms@0.594), (device.fps@300), (pcie.ms@3.4), (pcie.fps@100)
 #tab_nnp: (model@resnet50), (thread@1), (step@copyD2H),  (device.ms@1.24), (device.fps@310), (pcie.ms@3.4), (pcie.fps@100)

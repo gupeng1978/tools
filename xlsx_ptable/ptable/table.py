@@ -229,7 +229,11 @@ class Table:
         sort_indexes = [record_keys.index(key) for key in sort_keys]
 
         # 根据sort_indexes对self.records进行排序
-        records.sort(key=lambda record: [record[index] if isinstance(record[index], (int, float)) else str(record[index]) for index in sort_indexes])
+        try:
+            records.sort(key=lambda record: [record[index] if isinstance(record[index], (int, float)) else str(record[index]) for index in sort_indexes])
+        except TypeError:
+            records.sort(key=lambda record: [str(record[index]) for index in sort_indexes])
+
         
         self.__sort_key_row_index = sort_indexes
     
