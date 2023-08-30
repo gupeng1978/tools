@@ -305,8 +305,8 @@ class Table:
             self.__table_info['first_table'] = False
             
         self.__table_info['header']['row_end'] = self.__table_info['header']['row_start'] + len(self.__header.headers) - 1
-        self.__table_info['record']['row_start'] = self.__table_info['header']['row_end'] + 1
-        self.__table_info['record']['row_end'] = self.__table_info['record']['row_start'] + len(self.__records[0].records) - 1
+        
+        
        
         # 将表头写入工作表        
         for header in self.__header.headers:
@@ -318,21 +318,31 @@ class Table:
             raise ValueError("多个record必须设置hash_key")
         
         # 把多个record对象的数据合并到第一个record对象中
+        def __combine_record_obj(first, second, hash_key):
+            combined = first.records
+            left = second.records
+            for record1 in first.records:
+                hash_val = hash(tuple(record1[key] for key in hash_key))
+                for record2 in second.records:
+                    other_hash_val = hash(tuple(record2[key] for key in hash_key))
+                    if hash_val == other_hash_val:
+                        record1 = Table.__combine_two_records(record1, record2)
+                        left.remove(record2)
+                        break
+            if left:
+                combined.extend(left)
+            first.records = combined
+        
         first_record_obj = self.__records[0]
         if self.__header.hash_key:
             others_record_obj = self.__records[1:]
-            for record in first_record_obj.records:
-                hash_val = hash(tuple(record[key] for key in self.__header.hash_key))
-                for other_record_obj in others_record_obj:
-                    for other_record in other_record_obj.records:
-                        other_hash_val = hash(tuple(other_record[key] for key in self.__header.hash_key))
-                        if hash_val == other_hash_val:
-                            record = Table.__combine_two_records(record, other_record)
-                            break
-                pass
-        
-        
-        
+            for other_record_obj in others_record_obj:
+                __combine_record_obj(first_record_obj, other_record_obj, self.__header.hash_key)
+            self.__records = [first_record_obj]
+        # bugfix:  records合并后长度变化，需要重新计算record的起始和结束行
+        self.__table_info['record']['row_start'] = self.__table_info['header']['row_end'] + 1
+        self.__table_info['record']['row_end'] = self.__table_info['record']['row_start'] + len(self.__records[0].records) - 1
+                
         # 以第一个记录表排序
         self.__expand_and_sort_by_keys(self.__records[0].records, self.__header.record_keys, self.__header.sort_keys)
         record_row_start = worksheet.max_row + 1

@@ -23,3 +23,5 @@
 #tab_nnp: (model@mobileNet-V2), (thread@4), (step@copyD2H),  (pcie.ms@4.9),
 #tab_nnp: (model@mobileNet-V2), (thread@4), (step@dclmdlExecute),  (pcie.ms@6.6),
 ...
+#tab_nnp: (model@resnet34), (thread@1), (step@copyH2D), (pcie.ms@6.4),
+#tab_nnp: (model@resnet34), (thread@1), (step@copyD2H), (pcie.ms@8.2),
