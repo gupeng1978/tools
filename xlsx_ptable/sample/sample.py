@@ -1,7 +1,7 @@
 from ptable import gen_excel_table
 
 # sample1: simple sample1
-gen_excel_table("sample1.cfg") 
+gen_excel_table("sample1.cfg")
 
 
 # sample2: simple sample2
@@ -22,3 +22,6 @@ gen_excel_table("sample5.cfg")
 
 # sample6： sample with table combined with 2 logs and formula
 gen_excel_table("sample6.cfg")
+
+# sample7： column more than 'Z'
+gen_excel_table("sample7.cfg")
